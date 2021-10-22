@@ -1,0 +1,31 @@
+[
+    {
+        "table": "Top 10 hardest pitches thrown",
+        "headers": [
+            "Player Name",
+            "Team",
+            "Pitch Release Velocity",
+            "Pitch Type"
+        ]
+    },
+    {
+        "table": "Average 4-seam fastball velocity for each teams pitchers",
+        "headers": [
+            "Rockies Average Velocity",
+            "Giants Average Velocity"
+        ]
+    },
+    {
+        "table": "All the pitches thrown with same velocity",
+        "headers": [
+            "Player Name",
+            "Team",
+            "Pitch Release Velocity",
+            "Pitch Type",
+            "Inning",
+            "Balls",
+            "Strikes",
+            "Outs"
+        ]
+    }
+]

@@ -1,0 +1,20 @@
+Briefly describe your experiences with cloud technologies.
+
+I began using AWS cloud services with Autodesk, deploying many serverless ETL processes while with their performance monitoring team. I was tasked to retrieve data across Autodesk,
+transform the data and ingest data sources such as InfluxDB, PostgreSQL, MongoDB, S3 with Athena.
+With Element Science, I was involved with developing our backend service using ECS. I also utilized Amazon's CDN service CloudFront to remove all hard-coded
+assets from our mobile application and hosting them on S3, reducing overall size of mobile app and eliminating FDA labeling concerns.
+
+Using AWS, I would begin with creating a CRON service to collect data (either Lambda and the built CRON scheduler or EC2 and using crontab to create the timer).
+The service will then 
+
+Also, describe how you would design an ETL pipeline from Source to TARGET using a service like Azure or AWS.
+Feel free to research anything that can help you with this, talk about specific cloud applications, (for example AWS S3 buckets or Azure Blob Storage) and how you would create this pipeline using a cloud service. Also, feel free to include diagrams or other visual aids to help your explanation if necessary. (Please keep this under 600 words).
+
+- First I would check whether data needs to be: ingested once or polled for new data.
+- Create a Lambda in Python to fetch data from datasource (use Lambda cron scheduler to poll for new data)
+- Lambda can also be triggered by API Gateway and retrieve data from external source.
+- Use pandas library to parse and transform data (use Lambdas Layer)
+- Utilize boto3, psycopg2, or other database python packages to send to TARGET datasource (S3, PostgreSQL, etc.).
+- Set Lambda settings to ensure within VPC and apply security roles if needed.
+
