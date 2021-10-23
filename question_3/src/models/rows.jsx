@@ -1,6 +1,5 @@
 const modelRows = (gRows) => {
     let _rows = gRows;
-    console.log(_rows);
     let returnRows = []
 
     for (const _row of _rows.entries()) {

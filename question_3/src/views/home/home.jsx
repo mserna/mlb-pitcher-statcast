@@ -16,20 +16,20 @@ const Home = (props) => {
   const [selectedFile, setSelectedFile] = useState(null);
 
   const processCSVData = (csv) => {
-    // csv()
-    // .fromStream(file)
-    // .then((jsonObj) => {
-    //   console.log("json obj: " + jsonObj);
-    //   return jsonObj;
-    // });
-    var lines=csv.split('\r');
+    var lines = csv.split('\r');
     var result = [];
-    var headers=lines[0].split(",");
-    for(var i=1;i<lines.length;i++){
+    var headers = lines[0].split(",");
+    for(var i = 1; i < lines.length; i++){
       var obj = {};
-      var currentline=lines[i].split(",");
-      for(var j=0;j<headers.length;j++){
-        obj[headers[j]] = currentline[j];
+      // Reg expression to bypass comma in player_name
+      var currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+      for(var j = 0; j < headers.length; j++){
+        // Check for null values
+        if (currentline[j] == "NULL") {
+          obj[headers[j]] = null;
+        } else {
+          obj[headers[j]] = currentline[j];
+        }
       }
       result.push(obj);
     }
@@ -40,10 +40,11 @@ const Home = (props) => {
     let file = event.target.files[0];
     const fileReader = new FileReader();
     if (file) {
-      fileReader.readAsText(file, "UTF-8");
+      // fileReader.readAsText(file, "UTF-8");
+      fileReader.readAsText(file);
       fileReader.onload = (event) => {
         const data = processCSVData(event.target.result);
-        console.log(data);
+        setSelectedFile(data);
       }
     }
   };

@@ -5,13 +5,14 @@ function createData(name, team, velocity, type) {
 }
 
 var pitchers = [];
-var similarPitchers = [];
 
 class PitchingServices extends Component {
 
-    top10HardestPitchesThrown = (data) => {
+    // TODO - Issue with numbers not displaying - fix later
+    fastest4SeamPitchers = (data) => {
+
         if (!data) {
-            let noData = [createData("N/A","N/A", 0, "N/A")];
+            let noData = [createData("N/A","N/A", 0)];
             return noData;
         }
 
@@ -20,78 +21,30 @@ class PitchingServices extends Component {
         
         for (const entry of _data.entries()) {
             let item = entry[1];
-            let playername = item.pitcher_first_name + ' ' + item.pitcher_last_name;
-            let team = item.pitcher_team;
-            
-            // Convert string to number type
-            let pitchreleasevelocity = +item.pitch_release_velocity;
-            let pitchtype = item.pitch_type;
+
+            // Check if player throws 4 seam
+            if (item.four_seam_speed) {
+                let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
+                let team = item.team_abbrev;
+                let speed = item.four_seam_speed;
+
+                // Convert 4-seam to number type
+                let doubleFourSeam = +speed;
            
-            _rows.push({
-                playername,
-                team,
-                pitchreleasevelocity,
-                pitchtype
-            })
-        }
-
-        pitchers = _rows;
-        return _rows.sort((a, b) => (a.pitchreleasevelocity < b.pitchreleasevelocity) ? 1 : -1);
-    }
-
-    averageFourSeamFastball = () => {
-        let giants = this.avergeFourSeamFastballForGiants();
-        let rockies = this.averageFourSeamFastballForRockies();
-        return [giants, rockies];
-    }
-
-    avergeFourSeamFastballForGiants = () => {
-        if (pitchers.length === 0) {
-            return []; 
-        }
-
-        var fourseamPitches = []
-        var sum = 0
-
-        for (const pitcher of pitchers.entries()) {
-            var element = pitcher[1]
-            if (element.team === "SF") {
-                fourseamPitches.push(element.pitchreleasevelocity);
-                var pitchvelocity = +element.pitchreleasevelocity;
-                sum += pitchvelocity;
+                _rows.push({
+                    playername,
+                    team,
+                    doubleFourSeam
+                })
             }
         }
-        var rockiesaveragevelocity = "-";
-        var giantsaveragevelocity = sum / fourseamPitches.length;
-        console.log("avg: ", giantsaveragevelocity);
-        return { giantsaveragevelocity, rockiesaveragevelocity };
+
+        return _rows.sort((a, b) => (a.doubleFourSeam < b.doubleFourSeam) ? 1 : -1);
     }
 
-    averageFourSeamFastballForRockies = (data) => {
-        if (pitchers.length === 0) {
-            return []; 
-        }
-
-        var fourseamPitches = []
-        var sum = 0
-
-        for (const pitcher of pitchers.entries()) {
-            var element = pitcher[1]
-            if (element.team === "COL") {
-                fourseamPitches.push(element.pitchreleasevelocity);
-                var pitchvelocity = +element.pitchreleasevelocity;
-                sum += pitchvelocity;
-            }
-        }
-        var giantsaveragevelocity = "-";
-        var rockiesaveragevelocity = sum / fourseamPitches.length;
-        console.log("avg: ", rockiesaveragevelocity);
-        return { rockiesaveragevelocity, giantsaveragevelocity };
-    }
-
-    listAllPitchesSameVelocity = (data) => {
+    highestSpinRate = (data, pitch) => {
         if (!data) {
-            let noData = [createData("N/A","N/A", 0, "N/A", "N/A", 0, 0, 0)];
+            let noData = [createData("N/A","N/A", 0)];
             return noData;
         }
 
@@ -100,44 +53,63 @@ class PitchingServices extends Component {
         
         for (const entry of _data.entries()) {
             let item = entry[1];
-            let playername = item.pitcher_first_name + ' ' + item.pitcher_last_name;
-            let team = item.pitcher_team;
-            
-            // Convert string to number type
-            let pitchreleasevelocity = +item.pitch_release_velocity;
-            let pitchtype = item.pitch_type;
-            let inning = item.inning;
-            let balls = item.balls;
-            let strikes = item.strikes;
-            let outs = item.outs;
+
+            // Check if player throws 4 seam
+            if (item[pitch + '_spin']) {
+                let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
+                let team = item.team_abbrev;
+                let spinrate = item.four_seam_spin;
+
+                // Convert spinrate to number
+                let numSpinRate = +spinrate;
            
-            if (_rows.some(el => el.pitchreleasevelocity === pitchreleasevelocity)) {
-                console.log("Found similar pitches");
-                let similarPitch = _rows.filter(el => el.pitchreleasevelocity === pitchreleasevelocity);
-                console.log("similar pitch: ", similarPitch[0]);
-                // If two pitches have same velocity put into another array
-                // Space complexity will hinder using this technique
-                // let previousRecord = _rows[similarPitch];
-                // console.log("prev:", previousRecord);
-                if (!similarPitchers.includes(similarPitch[0])) {
-                    similarPitchers.push(similarPitch[0]);
-                }
+                _rows.push({
+                    playername,
+                    team,
+                    numSpinRate
+                })
             }
-            _rows.push({
-                playername,
-                team,
-                pitchreleasevelocity,
-                pitchtype,
-                inning,
-                balls,
-                strikes,
-                outs
-            });
         }
 
-        // console.log("list: ", similarPitchers.len);
-        return similarPitchers.sort((a, b) => (a.pitchreleasevelocity < b.pitchreleasevelocity) ? 1 : -1);
+        return _rows.sort((a, b) => (a.numSpinRate < b.numSpinRate) ? 1 : -1);
     }
+
+    mostPitchesThrown = (data) => {
+        if (!data) {
+            let noData = [createData("N/A","N/A", 0)];
+            return noData;
+        }
+
+        let _rows = [];
+        let _data = JSON.parse(data);
+        
+        for (const entry of _data.entries()) {
+            let item = entry[1];
+
+            if (item.player_name_last_first) {
+                let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
+                let team = item.team_abbrev;
+                let pitches = item.num_pitches;
+
+                // Convert spinrate to number
+                let numpitches = +pitches;
+
+                _rows.push({
+                    playername,
+                    team,
+                    numpitches
+                })
+            }
+        }
+        
+        return _rows.sort((a, b) => (a.numpitches < b.numpitches) ? 1 : -1);
+    }
+
+    // Nice to haves - can look into getting these values from another datasource
+    mostWins = () => {}
+    mostKs = () => {}
+    mostLosses = () => {}
+    highestERA = () => {}
 }
 
 export { PitchingServices };

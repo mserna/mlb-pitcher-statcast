@@ -19,7 +19,6 @@ const Profile = (props) => {
     if (file) {
       fileReader.readAsText(file, "UTF-8");
       fileReader.onload = event => {
-        // console.log("event.target.result", event.target.result);
         setSelectedFile(event.target.result);
       }
     }

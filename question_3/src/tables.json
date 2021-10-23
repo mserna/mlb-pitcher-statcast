@@ -1,31 +1,26 @@
 [
     {
-        "table": "Top 10 hardest pitches thrown",
+        "table": "Fastest 4-seam fastball pitchers",
         "headers": [
             "Player Name",
             "Team",
-            "Pitch Release Velocity",
-            "Pitch Type"
+            "Velocity (mph)"
         ]
     },
     {
-        "table": "Average 4-seam fastball velocity for each teams pitchers",
-        "headers": [
-            "Rockies Average Velocity",
-            "Giants Average Velocity"
-        ]
-    },
-    {
-        "table": "All the pitches thrown with same velocity",
+        "table": "Highest spin rate",
         "headers": [
             "Player Name",
             "Team",
-            "Pitch Release Velocity",
-            "Pitch Type",
-            "Inning",
-            "Balls",
-            "Strikes",
-            "Outs"
+            "Spin Rate (rpm)"
+        ]
+    },
+    {
+        "table": "Most pitches thrown",
+        "headers": [
+            "Player Name",
+            "Team",
+            "Number of pitches"
         ]
     }
 ]
