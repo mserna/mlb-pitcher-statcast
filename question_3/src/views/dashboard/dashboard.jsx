@@ -8,6 +8,7 @@ import { Select } from '@material-ui/core';
 // Internal imports
 import TopBar from '../../components/topnavbar';
 import StickyHeadTable from '../../components/table';
+import SearchBar from '../../components/searchbar';
 import tables from '../../tables.json';
 import { TableTitle } from '../title';
 import { modelColumns } from '../../models/columns';
@@ -57,7 +58,8 @@ const Dashboard = (props) => {
         <br/>
         <br/>
         <br/>
-
+        {/* <SearchBar/> */}
+        <br/>
         {/* Fastest pitchers */}
         <div>
             <TableTitle title={tableContent[0]}></TableTitle>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -59,7 +60,7 @@ export default function StickyHeadTable(props) {
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody deselectOnClickaway={false}>
             {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
@@ -71,6 +72,7 @@ export default function StickyHeadTable(props) {
                       </TableCell>
                     );
                   })}
+                  <Link to={`profile/${row.playerid}`} className="btb btn-sm btn-success m-2">View Profile</Link>
                 </TableRow>
               );
             })}

@@ -24,6 +24,7 @@ class PitchingServices extends Component {
 
             // Check if player throws 4 seam
             if (item.four_seam_speed) {
+                let playerid = item.player_id;
                 let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
                 let team = item.team_abbrev;
                 let speed = item.four_seam_speed;
@@ -32,6 +33,7 @@ class PitchingServices extends Component {
                 let doubleFourSeam = +speed;
            
                 _rows.push({
+                    playerid,
                     playername,
                     team,
                     doubleFourSeam
@@ -56,6 +58,7 @@ class PitchingServices extends Component {
 
             // Check if player throws 4 seam
             if (item[pitch + '_spin']) {
+                let playerid = item.player_id;
                 let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
                 let team = item.team_abbrev;
                 let spinrate = item.four_seam_spin;
@@ -64,6 +67,7 @@ class PitchingServices extends Component {
                 let numSpinRate = +spinrate;
            
                 _rows.push({
+                    playerid,
                     playername,
                     team,
                     numSpinRate
@@ -87,6 +91,7 @@ class PitchingServices extends Component {
             let item = entry[1];
 
             if (item.player_name_last_first) {
+                let playerid = item.player_id;
                 let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
                 let team = item.team_abbrev;
                 let pitches = item.num_pitches;
@@ -95,6 +100,7 @@ class PitchingServices extends Component {
                 let numpitches = +pitches;
 
                 _rows.push({
+                    playerid,
                     playername,
                     team,
                     numpitches
