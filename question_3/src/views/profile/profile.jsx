@@ -29,7 +29,8 @@ import Moment from 'moment';
 
 // Internal Imports
 import TopBar from '../../components/topnavbar';
-
+import ScatterChart from '../../components/scatterchart';
+import { PlayerServices } from '../../services/playerServices';
 
 // for material style guild
 const useStyles = makeStyles((theme) => ({
@@ -83,7 +84,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PlayerProfile = (props) => {
+const PlayerProfile = ({match}) => {
+  const { id } = match.params;
   const classes = useStyles();
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -91,7 +93,37 @@ const PlayerProfile = (props) => {
   const [scroll, setScroll] = useState('paper');
   const [playerDetailInfo, setplayerDetailInfo] = useState({});
 
-  // cancle dailoge
+  const playerServices = new PlayerServices();
+  const player_data = localStorage.getItem("json_data");
+
+  useEffect(() => {
+    loadPlayerProfile();
+  }, []);
+
+  const loadPlayerProfile = () => {
+    let _id = id.replace(/\r\n|\n|\r/gm, "");
+    let player = playerServices.getPlayerById(player_data, _id);
+    if (player) {
+      let player_name = player.player_name_last_first.replace(/['"]+/g, '');
+      setplayerDetailInfo({
+        player_name_last_first: player_name,
+        player_id: player.player_id,
+        team_abbrev: player.team_abbrev,
+        pitch_hand: player.pitch_hand,
+        pitches: [
+          player.four_seam_speed ? "4-seam fastball, " : "",
+          player.change_up_speed ? "Change-up, " : "",
+          player.curve_speed ? "Curve, " : "",
+          player.cutter_speed ? "Cutter, " : "",
+          player.sinker_speed ? "Sinker, " : "",
+          player.slider_speed ? "Slider, " : "",
+          player.splitter_speed ? "Splitter, " : "",
+        ]
+      });
+    }
+  };
+
+  // cancel dailoge
   const handleClose = () => {
     setOpen(false);
   };
@@ -157,6 +189,7 @@ const PlayerProfile = (props) => {
                                 : '-'}
                             </Typography>
                           </li>
+                          <br/>
                           <li>
                             <div className="font-14"> Player Name</div>
                             <Typography variant="body2">
@@ -167,16 +200,18 @@ const PlayerProfile = (props) => {
                               {' '}
                             </Typography>
                           </li>
+                          <br/>
                           <li>
                             <div className="font-14"> Pitch Hand</div>
                             <Typography variant="body2">
+                              {' '}
                               {playerDetailInfo.pitch_hand
-                                ? Moment(
-                                  playerDetailInfo.pitch_hand,
-                                ).format('MM-DD-YYYY')
+                                ? playerDetailInfo.pitch_hand
                                 : '-'}
+                              {' '}
                             </Typography>
                           </li>
+                          <br/>
                           <li>
                             <div className="font-14"> Pitches</div>
                             <Typography variant="body2">
@@ -194,12 +229,13 @@ const PlayerProfile = (props) => {
                       <TableContainer component={Paper}>
                         <div className="d-flex space-between table_header">
                           <div>
-                            <Typography
+                            {/* <Typography
                               variant="body2"
                               className="mr-15 SecondaryColor"
                             >
                               Charts
-                            </Typography>
+                            </Typography> */}
+                            <ScatterChart></ScatterChart>
                           </div>
                           <div />
                         </div>

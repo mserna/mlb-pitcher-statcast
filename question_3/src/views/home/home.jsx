@@ -14,6 +14,7 @@ import { Dashboard } from '../dashboard/dashboard';
 
 const Home = (props) => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [data, setDataStatus] = useState(false);
 
   const processCSVData = (csv) => {
     var lines = csv.split('\r');
@@ -44,10 +45,22 @@ const Home = (props) => {
       fileReader.readAsText(file);
       fileReader.onload = (event) => {
         const data = processCSVData(event.target.result);
+        localStorage.setItem("json_data", data);
         setSelectedFile(data);
       }
     }
   };
+
+  // Persist data
+  useEffect(() => {
+    let data = localStorage.getItem("json_data");
+    if (data) {
+      setSelectedFile(data);
+      setDataStatus(false);  // Set to true if have user upload once
+    } else {
+      setDataStatus(false);
+    }
+  }, []);
   
   return(
     <div>
@@ -63,7 +76,7 @@ const Home = (props) => {
         component="label"
       >
         Upload File
-        <input type="file" onChange={(event) => 
+        <input type="file" disabled={data} onChange={(event) => 
           fileSelectedHandler(event)
           }></input>
       </Button>
