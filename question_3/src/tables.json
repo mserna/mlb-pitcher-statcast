@@ -4,7 +4,7 @@
         "headers": [
             "Player Name",
             "Team",
-            "Velocity (mph)"
+            "Velocity"
         ]
     },
     {
@@ -12,7 +12,7 @@
         "headers": [
             "Player Name",
             "Team",
-            "Spin Rate (rpm)"
+            "Spin Rate"
         ]
     },
     {

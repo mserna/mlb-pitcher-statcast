@@ -12,12 +12,12 @@ import {
   makeStyles,
   Button,
 } from '@material-ui/core';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
+import { Box } from '@material-ui/core';
+import { InputLabel } from '@material-ui/core';
+import { MenuItem } from '@material-ui/core';
+import { FormControl } from '@material-ui/core';
+import { Select } from '@material-ui/core';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -31,6 +31,7 @@ import Moment from 'moment';
 import TopBar from '../../components/topnavbar';
 import ScatterChart from '../../components/scatterchart';
 import { PlayerServices } from '../../services/playerServices';
+import { PitchingServices } from '../../services/pitchingServices';
 
 // for material style guild
 const useStyles = makeStyles((theme) => ({
@@ -92,8 +93,13 @@ const PlayerProfile = ({match}) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [scroll, setScroll] = useState('paper');
   const [playerDetailInfo, setplayerDetailInfo] = useState({});
+  const [pitch, setPitch] = useState(null);
+  const [pitch_speed, setPitchSpeed] = useState({});
+  const [pitch_spin, setPitchSpin] = useState({});
+  const [pitch_pct, setPitchPct] = useState({});
 
   const playerServices = new PlayerServices();
+  const pitchingServices = new PitchingServices();
   const player_data = localStorage.getItem("json_data");
 
   useEffect(() => {
@@ -118,10 +124,80 @@ const PlayerProfile = ({match}) => {
           player.sinker_speed ? "Sinker, " : "",
           player.slider_speed ? "Slider, " : "",
           player.splitter_speed ? "Splitter, " : "",
-        ]
+        ],
+        player: player
       });
+      
+      // Set charts up on load
+      // setSpeedChart(pitch);
+      // setSpinChart(pitch);
+      // setPctChart(pitch);
     }
   };
+
+  const setSpeedChart = (pitch) => {
+    let metric = "speed";
+
+    const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
+    const pitchersNumPitches = playerDetailInfo.player.num_pitches * playerDetailInfo.player[`${pitch}_pct`];
+
+    setPitchSpeed({
+      label: pitch,
+      league_data: {
+        x: leagueAvg[1],
+        y: leagueAvg[0]
+      },
+      player_data: {
+        x: pitchersNumPitches,
+        y: playerDetailInfo.player[`${pitch}_${metric}`]
+      }
+    });
+  };
+
+  const setSpinChart = (pitch) => {
+    let metric = "spin";
+
+    const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
+    const pitchersNumPitches = playerDetailInfo.player.num_pitches * playerDetailInfo.player[`${pitch}_pct`];
+
+    setPitchSpin({
+      label: pitch,
+      league_data: {
+        x: leagueAvg[1],
+        y: leagueAvg[0]
+      },
+      player_data: {
+        x: pitchersNumPitches,
+        y: playerDetailInfo.player[`${pitch}_${metric}`]
+      }
+    });
+  };
+
+  const setPctChart = (pitch) => {
+    let metric = "pct";
+
+    const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
+    const pitchersNumPitches = playerDetailInfo.player.num_pitches * playerDetailInfo.player[`${pitch}_pct`];
+
+    setPitchPct({
+      label: pitch,
+      league_data: {
+        x: leagueAvg[1],
+        y: leagueAvg[0]
+      },
+      player_data: {
+        x: pitchersNumPitches,
+        y: playerDetailInfo.player[`${pitch}_${metric}`]
+      }
+    });
+  };
+
+  const onHandleChange = (event) => {
+    setPitch(event.target.value);
+    setSpeedChart(event.target.value);
+    setSpinChart(event.target.value);
+    setPctChart(event.target.value);
+  }
 
   // cancel dailoge
   const handleClose = () => {
@@ -225,22 +301,86 @@ const PlayerProfile = ({match}) => {
                     </Card>
                   </Grid>
                   <Grid item lg={12} md={12} xl={12} xs={12}>
+                    <div >
+                      <TableContainer>
+                      <Box sx={{ minWidth: 120 }}>
+                      <FormControl fullWidth>
+                          <InputLabel id="demo-simple-select-label">Pitch Type</InputLabel>
+                          <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={pitch}
+                          label="Pitch Type"
+                          onChange={onHandleChange}
+                          >
+                          <MenuItem value={"four_seam"}>4-seam</MenuItem>
+                          <MenuItem value={"change_up"}>Change-up</MenuItem>
+                          <MenuItem value={"curve"}>Curve</MenuItem>
+                          <MenuItem value={"cutter"}>Cutter</MenuItem>
+                          <MenuItem value={"sinker"}>Sinker</MenuItem>
+                          <MenuItem value={"slider"}>Slider</MenuItem>
+                          <MenuItem value={"splitter"}>Splitter</MenuItem>
+                          </Select>
+                      </FormControl>
+                      </Box>
+                      </TableContainer>
+                    </div>
+                  </Grid>
+                  <Grid lg={4} md={4} xl={4} xs={12}>
                     <div className="report_table">
                       <TableContainer component={Paper}>
                         <div className="d-flex space-between table_header">
                           <div>
-                            {/* <Typography
-                              variant="body2"
-                              className="mr-15 SecondaryColor"
-                            >
-                              Charts
-                            </Typography> */}
-                            <ScatterChart></ScatterChart>
+                            <ScatterChart 
+                              title="Speed (mph)" 
+                              data={pitch_speed.data}
+                              league_data={pitch_speed.league_data}
+                              player_data={pitch_speed.player_data} 
+                              label={pitch_speed.label}>
+                            </ScatterChart>
                           </div>
                           <div />
                         </div>
                       </TableContainer>
                     </div>
+                  </Grid>
+                  <Grid lg={4} md={4} xl={4} xs={12}>
+                    <div className="report_table">
+                      <TableContainer component={Paper}>
+                        <div className="d-flex space-between table_header">
+                          <div>
+                            <ScatterChart 
+                              title="Spin rate (rpm)" 
+                              data={pitch_spin.data}
+                              league_data={pitch_spin.league_data}
+                              player_data={pitch_spin.player_data} 
+                              label={pitch_spin.label}>
+                            </ScatterChart>
+                          </div>
+                          <div />
+                        </div>
+                      </TableContainer>
+                    </div>
+                  </Grid>
+                  <Grid lg={4} md={4} xl={4} xs={12}>
+                    <div className="report_table">
+                      <TableContainer component={Paper}>
+                        <div className="d-flex space-between table_header">
+                          <div>
+                            <ScatterChart 
+                              title="Pitch thrown" 
+                              data={pitch_pct.data}
+                              league_data={pitch_pct.league_data}
+                              player_data={pitch_pct.player_data} 
+                              label={pitch_pct.label}>
+                            </ScatterChart>
+                          </div>
+                          <div />
+                        </div>
+                      </TableContainer>
+                    </div>
+                  </Grid>
+                  <Grid item lg={12} md={12} xl={12} xs={12}>
                   </Grid>
                 </Grid>
               </Container>
