@@ -58,7 +58,8 @@ const Dashboard = (props) => {
         <br/>
         <br/>
         <br/>
-        {/* <SearchBar/> */}
+        <h3>Search</h3>
+        <SearchBar></SearchBar>
         <br/>
         {/* Fastest pitchers */}
         <div>
