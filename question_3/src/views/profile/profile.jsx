@@ -30,6 +30,8 @@ import Moment from 'moment';
 // Internal Imports
 import TopBar from '../../components/topnavbar';
 import ScatterChart from '../../components/scatterchart';
+import Polar from '../../components/polarchart';
+import HorizontalBarChart from '../../components/barcart';
 import { PlayerServices } from '../../services/playerServices';
 import { PitchingServices } from '../../services/pitchingServices';
 
@@ -92,11 +94,18 @@ const PlayerProfile = ({match}) => {
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [scroll, setScroll] = useState('paper');
+
+  // Player hooks
   const [playerDetailInfo, setplayerDetailInfo] = useState({});
-  const [pitch, setPitch] = useState(null);
+  const [pitch, setPitch] = useState("four_seam");
   const [pitch_speed, setPitchSpeed] = useState({});
   const [pitch_spin, setPitchSpin] = useState({});
   const [pitch_pct, setPitchPct] = useState({});
+  const [pitches_pct, setPitchesPct] = useState({});
+  const [pitch_count_avg, setPitchCntAvg] = useState(0);
+  const [player_pitch_cnt, setPlayerPitchCount] = useState(0);
+  const [player_plate_app, setPlayerPlateApp] = useState(0);
+  const [league_plate_app, setLeaguePlateApp] = useState(0);
 
   const playerServices = new PlayerServices();
   const pitchingServices = new PitchingServices();
@@ -127,19 +136,30 @@ const PlayerProfile = ({match}) => {
         ],
         player: player
       });
-      
-      // Set charts up on load
-      // setSpeedChart(pitch);
-      // setSpinChart(pitch);
-      // setPctChart(pitch);
+
+      // load charts upon page load
+      let player_pitch_pct = pitchingServices.getPitchPCT(player);
+      setPitchesPct(player_pitch_pct);
+
+      setSpeedChart(pitch, player);
+      setSpinChart(pitch, player);
+      setPctChart(pitch, player);
+
+      let league_pitch_count = pitchingServices.getLeaguePitchCount(player_data);
+      setPlayerPitchCount(player.num_pitches);
+      setPitchCntAvg(league_pitch_count);
+
+      let league_plate_count = pitchingServices.getLeaguePlateAppearance(player_data);
+      setPlayerPlateApp(player.plate_appearances);
+      setLeaguePlateApp(league_plate_count);
     }
   };
 
-  const setSpeedChart = (pitch) => {
+  const setSpeedChart = (pitch, player) => {
     let metric = "speed";
 
     const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
-    const pitchersNumPitches = playerDetailInfo.player.num_pitches * playerDetailInfo.player[`${pitch}_pct`];
+    const pitchersNumPitches = player.num_pitches * player[`${pitch}_pct`];
 
     setPitchSpeed({
       label: pitch,
@@ -149,16 +169,16 @@ const PlayerProfile = ({match}) => {
       },
       player_data: {
         x: pitchersNumPitches,
-        y: playerDetailInfo.player[`${pitch}_${metric}`]
+        y: player[`${pitch}_${metric}`]
       }
     });
   };
 
-  const setSpinChart = (pitch) => {
+  const setSpinChart = (pitch, player) => {
     let metric = "spin";
 
     const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
-    const pitchersNumPitches = playerDetailInfo.player.num_pitches * playerDetailInfo.player[`${pitch}_pct`];
+    const pitchersNumPitches = player.num_pitches * player[`${pitch}_pct`];
 
     setPitchSpin({
       label: pitch,
@@ -168,16 +188,16 @@ const PlayerProfile = ({match}) => {
       },
       player_data: {
         x: pitchersNumPitches,
-        y: playerDetailInfo.player[`${pitch}_${metric}`]
+        y: player[`${pitch}_${metric}`]
       }
     });
   };
 
-  const setPctChart = (pitch) => {
+  const setPctChart = (pitch, player) => {
     let metric = "pct";
 
     const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
-    const pitchersNumPitches = playerDetailInfo.player.num_pitches * playerDetailInfo.player[`${pitch}_pct`];
+    const pitchersNumPitches = player.num_pitches * player[`${pitch}_pct`];
 
     setPitchPct({
       label: pitch,
@@ -187,16 +207,16 @@ const PlayerProfile = ({match}) => {
       },
       player_data: {
         x: pitchersNumPitches,
-        y: playerDetailInfo.player[`${pitch}_${metric}`]
+        y: player[`${pitch}_${metric}`]
       }
     });
   };
 
   const onHandleChange = (event) => {
     setPitch(event.target.value);
-    setSpeedChart(event.target.value);
-    setSpinChart(event.target.value);
-    setPctChart(event.target.value);
+    setSpeedChart(event.target.value, playerDetailInfo.player);
+    setSpinChart(event.target.value, playerDetailInfo.player);
+    setPctChart(event.target.value, playerDetailInfo.player);
   }
 
   // cancel dailoge
@@ -368,7 +388,7 @@ const PlayerProfile = ({match}) => {
                         <div className="d-flex space-between table_header">
                           <div>
                             <ScatterChart 
-                              title="Pitch thrown" 
+                              title="% thrown" 
                               data={pitch_pct.data}
                               league_data={pitch_pct.league_data}
                               player_data={pitch_pct.player_data} 
@@ -382,6 +402,43 @@ const PlayerProfile = ({match}) => {
                   </Grid>
                   <Grid item lg={12} md={12} xl={12} xs={12}>
                   </Grid>
+                  <Grid item lg={6} md={6} xl={6} xs={12}>
+                    <div className="report_table">
+                      <TableContainer component={Paper}>
+                        <div className="d-flex space-between table_header">
+                          <div>
+                            <Polar 
+                              title="Pitch PCT" 
+                              data={pitches_pct}
+                              league_data={pitch_speed.league_data}
+                              player_data={pitch_speed.player_data} 
+                              label={pitch_speed.label}>
+                            </Polar>
+                          </div>
+                          <div />
+                        </div>
+                      </TableContainer>
+                    </div>
+                  </Grid>
+                  <Grid item lg={6} md={6} xl={6} xs={12}>
+                    <div className="report_table">
+                      <TableContainer component={Paper}>
+                        <HorizontalBarChart 
+                          component={Paper}
+                          axis_label="Num pitches"
+                          league_data={pitch_count_avg}
+                          player_data={player_pitch_cnt}>
+                        </HorizontalBarChart>
+                        <HorizontalBarChart 
+                          component={Paper}
+                          axis_label="Plate apps"
+                          league_data={league_plate_app}
+                          player_data={player_plate_app}>
+                        </HorizontalBarChart>
+                      </TableContainer>
+                    </div>
+                  </Grid>
+                  
                 </Grid>
               </Container>
             </div>

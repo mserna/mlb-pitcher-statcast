@@ -17,4 +17,9 @@ Feel free to research anything that can help you with this, talk about specific 
 - Use pandas library to parse and transform data (use Lambdas Layer)
 - Utilize boto3, psycopg2, or other database python packages to send to TARGET datasource (S3, PostgreSQL, etc.).
 - Set Lambda settings to ensure within VPC and apply security roles if needed.
+- ETL process diagram to enter data into a relational DB:
+
+
+
+
 

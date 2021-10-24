@@ -142,6 +142,67 @@ class PitchingServices extends Component {
         ];
     }
 
+    getLeaguePitchCount = (data) => {
+        if (!data) {
+            return;
+        }
+
+        let pitch_total = 0;
+        let counter = 0;
+        let _data = JSON.parse(data);
+
+        for (const entry of _data.entries()) {
+            let item = entry[1];
+            
+            if(item.num_pitches) {
+                pitch_total += +item.num_pitches;
+                counter += 1;
+            }
+        }
+
+        return pitch_total / counter;
+    }
+
+    getLeaguePlateAppearance = (data) => {
+        if (!data) {
+            return;
+        }
+
+        let plate_total = 0;
+        let counter = 0;
+        let _data = JSON.parse(data);
+
+        for (const entry of _data.entries()) {
+            let item = entry[1];
+            
+            if(item.plate_appearances) {
+                plate_total += +item.plate_appearances;
+                counter += 1;
+            }
+        }
+        
+        return plate_total / counter;
+    }
+
+    getPitchPCT = (player_data) => {
+        if (!player_data) {
+            return;
+        }
+
+        let pitch_arr = ["four_seam_pct", "curve_pct", "cutter_pct", "change_up_pct", "slider_pct", "splitter_pct", "sinker_pct"]
+        let res = {}
+        for (const entry of pitch_arr.entries()) {
+            let item = entry[1];
+            // Calculate pitch %
+            if (item in player_data) {
+                let pitch_pct = player_data[item] * player_data.num_pitches;
+                res[item] = pitch_pct;
+            }
+        }
+
+        return res;
+    }
+
     // Nice to haves - can look into getting these values from another datasource
     mostWins = () => {}
     mostKs = () => {}

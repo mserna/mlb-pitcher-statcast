@@ -1,5 +1,5 @@
 Requirements
-- This application uses React and Electron as well as npm to run scripts
+- This application uses React and Node to run
 - Dependencies include:
  - npm (Node Package Manager)
  - Browsers - Edge, Chrome or Firefox (has not been tested with Firefox)
@@ -9,28 +9,26 @@ Using the App
  - To use, click upload file to upload devtest.csv file
  - The dashboard will load the data in memory and will then provide league information about pitcher leaderboards
  - The user can search and drilldown to a specific pitcher and find out how they compete against other pitchers around the league and division
- 
-Note: This only uses SF Giants and Colorado series data for the initial projects purpose.
-My intention will be to create an application where it automatically fetches new game/series data and displays
-relevant data for the end user.
 
 Run from Command Line:
-- Run `npm i --legacy-peer-deps`
-- Run `npm run start`
+- Run `npm install`
+- Run `npm run start` or `npm start`
 - It will launch a browser to run application
 
 Installation:
 
-- Run `npm i --legacy-peer-deps`
+- Run `npm install`
 - Run `npm run build`
 - This will create a local build folder in the repoository
 
-Downgrade/Upgrade Node:
-- Install nvm from https://github.com/coreybutler/nvm-windows
-- Run `nvm install 15.14.0`
-- Run `nvm use 15.14.0 `
-- Run `node -v` to check version has changed
-- You can run `nvm use 16.0.0` to go back to original version
+Node compatible and tested version: `v15.4.0`
+If needed:
+    Downgrade/Upgrade Node:
+    - Install nvm from https://github.com/coreybutler/nvm-windows
+    - Run `nvm install 15.14.0`
+    - Run `nvm use 15.14.0 `
+    - Run `node -v` to check version has changed
+    - You can run `nvm use 16.0.0` to go back to original version
 
 Breakdown of project:
 The first thing I did was look at the data in devtest.csv. I needed to see what kind of data was presented to me. After seeing it was pitcher data, I then decided to create user needs and requirements. 
@@ -43,3 +41,8 @@ This page also contains charts on their pitches vs other pitchers average.
 
 Now that I had an idea, I wanted to choose the web framework to get this coded. I had two in mind: Python using Flask and React/Electron in NodeJS. I decided to go with NodeJS as I wanted to I liked the styling in React more. I could have used Matplotlib and numpy to get it done with Python as well, but felt I had a good baseline with React given my previous projects.
 
+NOTE: This uses CSV to load data and will only work with the devtest.csv (any other data will not load correctly)
+Also, ideally this data will be hosted on a database or S3 bucket. I have implemented an ETL process that ingested into a PostgreSQL db but due to time constraints,
+I was unable to create a robust backend service in time to implement with this frontend app.
+It would use an API gateway hosted on AWS and each request would be linked to a Lambda function that has credentials and connection to DB to connect to host.
+I would also use SQLAlchemy as the ORM to load the data as an object and return back to front end. The front end app would then use Axios package and an API handler to call API.
