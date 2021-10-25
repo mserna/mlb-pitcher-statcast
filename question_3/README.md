@@ -1,3 +1,9 @@
+
+![alt text](https://github.com/mserna/angels-exercise/blob/master/part1.gif)
+
+![alt text](https://github.com/mserna/angels-exercise/blob/master/part2.gif)
+
+
 Requirements
 - This application uses React and Node to run
 - Dependencies include:
@@ -22,13 +28,6 @@ Installation:
 - This will create a local build folder in the repoository
 
 Node compatible and tested version: `v15.4.0`
-If needed:
-    Downgrade/Upgrade Node:
-    - Install nvm from https://github.com/coreybutler/nvm-windows
-    - Run `nvm install 15.14.0`
-    - Run `nvm use 15.14.0 `
-    - Run `node -v` to check version has changed
-    - You can run `nvm use 16.0.0` to go back to original version
 
 Breakdown of project:
 The first thing I did was look at the data in devtest.csv. I needed to see what kind of data was presented to me. After seeing it was pitcher data, I then decided to create user needs and requirements. 
