@@ -25,7 +25,7 @@ const useStyles = makeStyles({
  * https://material-ui.com/components/tables/
  */
 
-export default function StickyHeadTable(props) {
+const StickyHeadTable = (props)  => {
   const classes = useStyles();
 
   const rows = props.rows;
@@ -92,3 +92,5 @@ export default function StickyHeadTable(props) {
     </Paper>
   );
 }
+
+export default StickyHeadTable;

@@ -3,8 +3,6 @@ import { Bar } from 'react-chartjs-2';
 
 const HorizontalBarChart = (props) => {
 
-    console.log(props.player_data)
-
     const data = {
         labels: [props.axis_label],
         datasets: [
