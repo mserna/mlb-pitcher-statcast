@@ -8,7 +8,6 @@ var pitchers = [];
 
 class PitchingServices extends Component {
 
-    // TODO - Issue with numbers not displaying - fix later
     fastest4SeamPitchers = (data) => {
 
         if (!data) {

@@ -41,8 +41,7 @@ const Home = (props) => {
     let file = event.target.files[0];
     const fileReader = new FileReader();
     if (file) {
-      // fileReader.readAsText(file, "UTF-8");
-      fileReader.readAsText(file);
+      fileReader.readAsText(file, "ISO-8859-1");
       fileReader.onload = (event) => {
         const data = processCSVData(event.target.result);
         localStorage.setItem("json_data", data);
