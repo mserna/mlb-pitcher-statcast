@@ -21,9 +21,9 @@ Using the App
 Run from Command Line:
 
 Run Backend service:
-- Run `pip3 install -r requirements.txt` - installs required modules
+- Run `pip3 install -r api/requirements.txt` - installs required modules
 - Run `python3 api/api_service.py`
-Optional:
+- Optional:
 - Run on docker using commands:
 - cd into api/ folder
 - `docker build -t api_service .`
