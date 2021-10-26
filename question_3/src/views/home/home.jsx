@@ -1,12 +1,9 @@
 import {React, useState, Component, useEffect} from 'react';
-import Axios from 'axios';
 import {
   Container,
   Button,
   Label
 } from '@material-ui/core';
-import { Link } from 'react-router-dom';
-import csv from 'csvtojson';
 
 // Internal imports
 import TopBar from '../../components/topnavbar';

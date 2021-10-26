@@ -23,6 +23,7 @@ const SearchBar = () => {
         <Autocomplete
           id="search-bar"
           disableClearable
+          disabled={!playerList}
           options={playerList}
           getOptionLabel={(player) => player.player_name}
           renderInput={(params) => (
