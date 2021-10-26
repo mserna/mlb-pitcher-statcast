@@ -61,7 +61,7 @@ const StickyHeadTable = (props)  => {
             </TableRow>
           </TableHead>
           <TableBody deselectOnClickaway={false}>
-            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+            {rows && rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                   {columns.map((column) => {
@@ -79,11 +79,11 @@ const StickyHeadTable = (props)  => {
           </TableBody>
         </Table>
       </TableContainer>
-      <CSVLink data={rows} >Download CSV file</CSVLink>
+      <CSVLink data={rows ? rows : ""} >Download CSV file</CSVLink>
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={rows.length}
+        count={rows ? rows.length : 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}

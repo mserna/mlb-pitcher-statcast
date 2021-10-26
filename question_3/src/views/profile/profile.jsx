@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import {
@@ -25,7 +25,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import Moment from 'moment';
 
 // Internal Imports
 import TopBar from '../../components/topnavbar';
@@ -34,6 +33,7 @@ import Polar from '../../components/polarchart';
 import HorizontalBarChart from '../../components/barcart';
 import { PlayerServices } from '../../services/playerServices';
 import { PitchingServices } from '../../services/pitchingServices';
+import APIClient from '../../services/apiHandler';
 
 // for material style guild
 const useStyles = makeStyles((theme) => ({
@@ -87,6 +87,7 @@ const useStyles = makeStyles((theme) => ({
 const PlayerProfile = ({match}) => {
   const { id } = match.params;
   const classes = useStyles();
+  const apiClient = new APIClient();
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -103,20 +104,32 @@ const PlayerProfile = ({match}) => {
   const [player_pitch_cnt, setPlayerPitchCount] = useState(0);
   const [player_plate_app, setPlayerPlateApp] = useState(0);
   const [league_plate_app, setLeaguePlateApp] = useState(0);
+  const [leagueData, setLeagueData] = useState(null);
 
   const playerServices = new PlayerServices();
   const pitchingServices = new PitchingServices();
-  const player_data = localStorage.getItem("json_data");
 
   useEffect(() => {
-    loadPlayerProfile();
+    apiClient.getPitcher(id)
+    .then((player_resp) => {
+      apiClient.getPitchers()
+      .then((league_resp) => {
+        setLeagueData(league_resp);
+        loadPlayerProfile(player_resp);
+        loadLeagueData(league_resp);
+        setSpeedChart(pitch, player_resp, league_resp);
+        setSpinChart(pitch, player_resp, league_resp);
+        setPctChart(pitch, player_resp, league_resp);
+      })
+    })
+    .catch(() => {
+      console.log("Can not get player data");
+    })
   }, []);
 
-  const loadPlayerProfile = () => {
-    let _id = id.replace(/\r\n|\n|\r/gm, "");
-    let player = playerServices.getPlayerById(player_data, _id);
+  const loadPlayerProfile = (player) => {
     if (player) {
-      let player_name = player.player_name_last_first.replace(/['"]+/g, '');
+      let player_name = player.player_name_last_first;
       setplayerDetailInfo({
         player_name_last_first: player_name,
         player_id: player.player_id,
@@ -138,24 +151,23 @@ const PlayerProfile = ({match}) => {
       let player_pitch_pct = pitchingServices.getPitchPCT(player);
       setPitchesPct(player_pitch_pct);
 
-      setSpeedChart(pitch, player);
-      setSpinChart(pitch, player);
-      setPctChart(pitch, player);
-
-      let league_pitch_count = pitchingServices.getLeaguePitchCount(player_data);
       setPlayerPitchCount(player.num_pitches);
-      setPitchCntAvg(league_pitch_count);
-
-      let league_plate_count = pitchingServices.getLeaguePlateAppearance(player_data);
       setPlayerPlateApp(player.plate_appearances);
-      setLeaguePlateApp(league_plate_count);
     }
   };
 
-  const setSpeedChart = (pitch, player) => {
+  const loadLeagueData = (data) => {
+    let league_pitch_count = pitchingServices.getLeaguePitchCount(data);
+    let league_plate_count = pitchingServices.getLeaguePlateAppearance(data);
+
+    setLeaguePlateApp(league_plate_count);
+    setPitchCntAvg(league_pitch_count);
+  }
+
+  const setSpeedChart = (pitch, player, league) => {
     let metric = "speed";
 
-    const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
+    const leagueAvg = pitchingServices.getLeaguePitchAverage(league, pitch, metric);
     const pitchersNumPitches = player.num_pitches * player[`${pitch}_pct`];
 
     setPitchSpeed({
@@ -171,10 +183,10 @@ const PlayerProfile = ({match}) => {
     });
   };
 
-  const setSpinChart = (pitch, player) => {
+  const setSpinChart = (pitch, player, league) => {
     let metric = "spin";
 
-    const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
+    const leagueAvg = pitchingServices.getLeaguePitchAverage(league, pitch, metric);
     const pitchersNumPitches = player.num_pitches * player[`${pitch}_pct`];
 
     setPitchSpin({
@@ -190,10 +202,10 @@ const PlayerProfile = ({match}) => {
     });
   };
 
-  const setPctChart = (pitch, player) => {
+  const setPctChart = (pitch, player, league) => {
     let metric = "pct";
 
-    const leagueAvg = pitchingServices.getLeaguePitchAverage(player_data, pitch, metric);
+    const leagueAvg = pitchingServices.getLeaguePitchAverage(league, pitch, metric);
     const pitchersNumPitches = player.num_pitches * player[`${pitch}_pct`];
 
     setPitchPct({
@@ -210,10 +222,12 @@ const PlayerProfile = ({match}) => {
   };
 
   const onHandleChange = (event) => {
-    setPitch(event.target.value);
-    setSpeedChart(event.target.value, playerDetailInfo.player);
-    setSpinChart(event.target.value, playerDetailInfo.player);
-    setPctChart(event.target.value, playerDetailInfo.player);
+    if (playerDetailInfo.player) {
+      setPitch(event.target.value);
+      setSpeedChart(event.target.value, playerDetailInfo.player, leagueData);
+      setSpinChart(event.target.value, playerDetailInfo.player, leagueData);
+      setPctChart(event.target.value, playerDetailInfo.player, leagueData);
+    }
   }
 
   // cancel dailoge

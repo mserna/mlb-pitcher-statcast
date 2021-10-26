@@ -1,4 +1,4 @@
-import {React, useState} from 'react';
+import {React, useState, useEffect} from 'react';
 import { Box } from '@material-ui/core';
 import { InputLabel } from '@material-ui/core';
 import { MenuItem } from '@material-ui/core';
@@ -13,14 +13,47 @@ import tables from '../../tables.json';
 import { TableTitle } from '../title';
 import { modelColumns } from '../../models/columns';
 import { PitchingServices } from '../../services/pitchingServices';
+import APIClient from '../../services/apiHandler';
 
-const Dashboard = (props) => {
+const Dashboard = () => {
 
     const pitchingServices = new PitchingServices();
+    const client = new APIClient();
     const [pitch, setPitch] = useState('four_seam');
+    const [data, setData] = useState(null);
+    const [row1, setRow1] = useState(null);
+    const [row2, setRow2] = useState(null);
+    const [row3, setRow3] = useState(null);
+
+    const getData = () => {
+        client.getPitchers()
+        .then((resp) => {
+            setData(resp);
+            loadTableData(resp);
+        })
+        .catch((error) => {
+            console.log("Something strange happened: ", error);
+        });
+    };
+
+    // Fetch data
+    useEffect(() => {
+        getData();
+    }, []);
+
+    const loadTableData = (data) => {
+        let rows1 = pitchingServices.fastest4SeamPitchers(data);
+        let rows2 = pitchingServices.highestSpinRate(data, pitch);
+        let rows3 = pitchingServices.mostPitchesThrown(data);
+        setRow1(rows1);
+        setRow2(rows2);
+        setRow3(rows3)
+    };
 
     const handleChange = (event) => {
         setPitch(event.target.value);
+        let rows2 = pitchingServices.highestSpinRate(data, event.target.value);
+        setRow2(rows2);
     };
 
     const tableContent = tables.map((table) =>
@@ -36,21 +69,18 @@ const Dashboard = (props) => {
         header
     );
     let col1 = modelColumns(table1headers);
-    let rows1 = pitchingServices.fastest4SeamPitchers(props.valueFromParent);
 
     // Table - Avg 4-seam fastball for both teams
     let table2headers = headerContent[1].map((header) =>
         header
     );
     let col2 = modelColumns(table2headers);
-    let rows2 = pitchingServices.highestSpinRate(props.valueFromParent, pitch);
 
     // Table - Highest number of pitches
     let table3headers = headerContent[2].map((header) =>
         header
     );
     let col3 = modelColumns(table3headers);
-    let rows3 = pitchingServices.mostPitchesThrown(props.valueFromParent);
 
     return(
         <div>
@@ -59,13 +89,13 @@ const Dashboard = (props) => {
         <br/>
         <br/>
         <h4>Search</h4>
-        <SearchBar></SearchBar>
+        <SearchBar data={data ? data : null}></SearchBar>
         <br/>
         {/* Fastest pitchers */}
         <div>
             <TableTitle title={tableContent[0]}></TableTitle>
             <StickyHeadTable 
-            rows={rows1}
+            rows={row1}
             columns={col1}
             />
             <br/>
@@ -96,7 +126,7 @@ const Dashboard = (props) => {
             </Box>
             <TableTitle title={tableContent[1]}></TableTitle>
             <StickyHeadTable 
-            rows={rows2}
+            rows={row2}
             columns={col2}
             />
             <br/>
@@ -106,7 +136,7 @@ const Dashboard = (props) => {
         <div>
             <TableTitle title={tableContent[2]}></TableTitle>
             <StickyHeadTable 
-            rows={rows3}
+            rows={row3}
             columns={col3}
             />
             <br/>

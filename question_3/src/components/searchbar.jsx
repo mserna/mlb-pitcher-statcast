@@ -5,17 +5,16 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { PlayerServices } from '../services/playerServices';
 import { Link } from 'react-router-dom';
 
-
-const SearchBar = () => {
+const SearchBar = (props) => {
   const [playerList, setPlayerList] = useState(null);
   const [player, setPlayer] = useState(null);
-  let players_data = localStorage.getItem("json_data");
 
   useEffect(() => {
+    console.log("search bar")
     let playerServices = new PlayerServices();
-    let _list = playerServices.getPlayerList(players_data);
+    let _list = playerServices.getPlayerList(props.data);
     setPlayerList(_list);
-  }, [players_data]);
+  }, [props.data]);
 
   return (
     <>

@@ -4,32 +4,26 @@ function createData(name, team, velocity, type) {
     return { name, team, velocity, type };
 }
 
-var pitchers = [];
-
 class PitchingServices extends Component {
 
     fastest4SeamPitchers = (data) => {
 
         if (!data) {
-            let noData = [createData("N/A","N/A", 0)];
+            let noData = [createData("N/A", "N/A","N/A", 0)];
             return noData;
         }
-
         let _rows = [];
-        let _data = JSON.parse(data);
         
-        for (const entry of _data.entries()) {
-            let item = entry[1];
-
+        for (const entry of data) {
             // Check if player throws 4 seam
-            if (item.four_seam_speed) {
-                let playerid = item.player_id;
-                let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
-                let team = item.team_abbrev;
-                let speed = item.four_seam_speed;
+            if (entry.four_seam_speed) {
+                let playerid = entry.player_id;
+                let playername = entry.player_name_last_first;
+                let team = entry.team_abbrev;
+                let speed = entry.four_seam_speed;
 
                 // Convert 4-seam to number type
-                let velocity = +speed;
+                let velocity = speed;
            
                 _rows.push({
                     playerid,
@@ -50,20 +44,18 @@ class PitchingServices extends Component {
         }
 
         let _rows = [];
-        let _data = JSON.parse(data);
         
-        for (const entry of _data.entries()) {
-            let item = entry[1];
+        for (const entry of data) {
 
             // Check if player throws 4 seam
-            if (item[pitch + '_spin']) {
-                let playerid = item.player_id;
-                let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
-                let team = item.team_abbrev;
-                let spin = item.four_seam_spin;
+            if (entry[pitch + '_spin']) {
+                let playerid = entry.player_id;
+                let playername = entry.player_name_last_first.replace(/['"]+/g, '', '');
+                let team = entry.team_abbrev;
+                let spin = entry.four_seam_spin;
 
                 // Convert spinrate to number
-                let spinrate = +spin;
+                let spinrate = spin;
            
                 _rows.push({
                     playerid,
@@ -84,19 +76,17 @@ class PitchingServices extends Component {
         }
 
         let _rows = [];
-        let _data = JSON.parse(data);
         
-        for (const entry of _data.entries()) {
-            let item = entry[1];
+        for (const entry of data) {
 
-            if (item.player_name_last_first) {
-                let playerid = item.player_id;
-                let playername = item.player_name_last_first.replace(/['"]+/g, '', '');
-                let team = item.team_abbrev;
-                let pitches = item.num_pitches;
+            if (entry.player_name_last_first) {
+                let playerid = entry.player_id;
+                let playername = entry.player_name_last_first;
+                let team = entry.team_abbrev;
+                let pitches = entry.num_pitches;
 
                 // Convert spinrate to number
-                let numberofpitches = +pitches;
+                let numberofpitches = pitches;
 
                 _rows.push({
                     playerid,
@@ -118,16 +108,14 @@ class PitchingServices extends Component {
         let pitch_total = 0;
         let total_metric = 0;
         let counter = 0;
-        let _data = JSON.parse(data);
         
-        for (const entry of _data.entries()) {
-            let item = entry[1];
+        for (const entry of data) {
 
             // Checks if pitcher has pitch
-            if (item[`${pitch}_${metric}`]) {
+            if (entry[`${pitch}_${metric}`]) {
                 // Add to to total
-                total_metric += +item[`${pitch}_${metric}`];
-                let tot_num_pitch_per_player = +item.num_pitches * +item[`${pitch}_pct`];
+                total_metric += entry[`${pitch}_${metric}`];
+                let tot_num_pitch_per_player = entry.num_pitches * entry[`${pitch}_pct`];
                 pitch_total += tot_num_pitch_per_player
                 counter += 1;
             }
@@ -148,13 +136,11 @@ class PitchingServices extends Component {
 
         let pitch_total = 0;
         let counter = 0;
-        let _data = JSON.parse(data);
 
-        for (const entry of _data.entries()) {
-            let item = entry[1];
+        for (const entry of data) {
             
-            if(item.num_pitches) {
-                pitch_total += +item.num_pitches;
+            if(entry.num_pitches) {
+                pitch_total += entry.num_pitches;
                 counter += 1;
             }
         }
@@ -169,13 +155,10 @@ class PitchingServices extends Component {
 
         let plate_total = 0;
         let counter = 0;
-        let _data = JSON.parse(data);
 
-        for (const entry of _data.entries()) {
-            let item = entry[1];
-            
-            if(item.plate_appearances) {
-                plate_total += +item.plate_appearances;
+        for (const entry of data) {
+            if(entry.plate_appearances) {
+                plate_total += +entry.plate_appearances;
                 counter += 1;
             }
         }
@@ -190,12 +173,11 @@ class PitchingServices extends Component {
 
         let pitch_arr = ["four_seam_pct", "curve_pct", "cutter_pct", "change_up_pct", "slider_pct", "splitter_pct", "sinker_pct"]
         let res = {}
-        for (const entry of pitch_arr.entries()) {
-            let item = entry[1];
+        for (const entry of pitch_arr) {
             // Calculate pitch %
-            if (item in player_data) {
-                let pitch_pct = player_data[item] * player_data.num_pitches;
-                res[item] = pitch_pct;
+            if (entry in player_data) {
+                let pitch_pct = player_data[entry] * player_data.num_pitches;
+                res[entry] = pitch_pct;
             }
         }
 
